@@ -1,0 +1,39 @@
+{
+  "name": "conduit",
+  "version": "1.0.0",
+  "description": "Multi-channel automation workflow engine with AI-powered responses",
+  "main": "dist/index.js",
+  "scripts": {
+    "dev": "node scripts/check-env.js && tsx watch src/index.ts",
+    "build": "tsc",
+    "start": "node scripts/check-env.js && node dist/index.js",
+    "worker": "node scripts/check-env.js && tsx src/workers/index.ts",
+    "setup": "node scripts/setup.js",
+    "validate-db": "node scripts/validate-database-url.js"
+  },
+  "keywords": [
+    "automation",
+    "workflow",
+    "multi-channel",
+    "ai"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.39.0",
+    "express": "^4.18.2",
+    "pg-boss": "^9.0.3",
+    "pino": "^8.17.2",
+    "pino-pretty": "^10.3.1",
+    "zod": "^3.22.4",
+    "dotenv": "^16.3.1",
+    "cors": "^2.8.5"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/node": "^20.10.6",
+    "@types/cors": "^2.8.17",
+    "tsx": "^4.7.0",
+    "typescript": "^5.3.3"
+  }
+}
