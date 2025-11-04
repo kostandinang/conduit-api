@@ -13,7 +13,6 @@ import { requestLogger, notFoundHandler, errorHandler } from './middleware';
  * This is the main API server that handles incoming requests
  * Queue workers run separately via: npm run worker
  */
-
 const app = express();
 
 // Middleware

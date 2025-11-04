@@ -11,7 +11,7 @@ const router = Router();
  * GET /health
  * Basic health check endpoint
  */
-router.get('/health', (req, res) => {
+router.get('/', (req, res) => {
   res.json({
     status: 'healthy',
     service: 'conduit',
@@ -23,7 +23,7 @@ router.get('/health', (req, res) => {
  * GET /health/detailed
  * Detailed health check with system info
  */
-router.get('/health/detailed', (req, res) => {
+router.get('/detailed', (req, res) => {
   res.json({
     status: 'healthy',
     service: 'conduit',

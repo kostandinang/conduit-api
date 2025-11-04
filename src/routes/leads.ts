@@ -10,8 +10,8 @@ import { leadController } from '../controllers/LeadController';
 const router = Router();
 
 // Lead management
-router.post('/lead', (req, res) => leadController.createLead(req, res));
-router.get('/lead/:id', (req, res) => leadController.getLeadTimeline(req, res));
+router.post('/', (req, res) => leadController.createLead(req, res));
+router.get('/:id', (req, res) => leadController.getLeadTimeline(req, res));
 
 // Message operations
 router.post('/send', (req, res) => leadController.sendMessage(req, res));

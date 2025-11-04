@@ -10,6 +10,6 @@ import leadsRouter from './leads';
 const router = Router();
 
 router.use('/health', healthRouter);
-router.use('/leads', leadsRouter);
+router.use('/lead', leadsRouter);
 
 export default router;
