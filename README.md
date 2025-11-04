@@ -110,7 +110,7 @@ curl -X POST http://localhost:3000/ai/reply \
 curl http://localhost:3000/lead/YOUR_LEAD_ID
 ```
 
-**💡 Pro tip:** Use our [Postman collection](Conduit.postman_collection.json) for a visual interface!
+**💡 Pro tip:** Use our [Postman collection](Conduit.postman_collection.json) for a visual interface, and [Postman guide](/docs/POSTMAN_GUIDE.md) on how to import the collection.
 
 ---
 
@@ -120,7 +120,7 @@ curl http://localhost:3000/lead/YOUR_LEAD_ID
 
 - 🔥 **Node.js + TypeScript** - Fast and type-safe
 - 🗄️ **Supabase** - Serverless PostgreSQL database
-- 🤖 **OpenAI** - Intelligent AI responses
+- 🤖 **OpenAI** - Intelligent AI responses$$
 - ⚡ **Express.js** - Lightweight web framework
 - 🔄 **PGBoss Queue** - Reliable background processing
 
@@ -183,6 +183,8 @@ Conduit routes leads through multiple messaging channels (WhatsApp, Email, Voice
 ## Architecture
 
 ![Architecture Diagram](docs/architecture-diagram.png)
+
+_See the full [architecture documentation](/docs/ARCHITECTURE_DECISIONS.md)_
 
 ### Key Design Decisions
 
