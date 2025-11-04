@@ -1,0 +1,496 @@
+{
+  "info": {
+    "name": "Conduit API",
+    "description": "Multi-channel sales engine with AI-powered responses. Complete API collection for testing all endpoints.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000",
+      "type": "string"
+    },
+    {
+      "key": "leadId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "jobId",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Health Checks",
+      "item": [
+        {
+          "name": "Basic Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/health",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "health"
+              ]
+            },
+            "description": "Basic health check endpoint to verify the API is running."
+          },
+          "response": []
+        },
+        {
+          "name": "Detailed Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/health/detailed",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "health",
+                "detailed"
+              ]
+            },
+            "description": "Detailed health check with system info including uptime and memory usage."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Lead Management",
+      "item": [
+        {
+          "name": "Create Lead",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.collectionVariables.set('leadId', jsonData.data.id);",
+                  "    console.log('Lead ID saved:', jsonData.data.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"John Doe\",\n  \"email\": \"john.doe@example.com\",\n  \"phone\": \"+1234567890\",\n  \"metadata\": {\n    \"source\": \"website\",\n    \"campaign\": \"spring-2024\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/lead",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "lead"
+              ]
+            },
+            "description": "Create a new lead. Either email or phone is required. The lead ID is automatically saved to collection variables."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Lead Timeline",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/lead/{{leadId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "lead",
+                "{{leadId}}"
+              ]
+            },
+            "description": "Get complete timeline for a lead including messages, jobs, and events."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Messaging",
+      "item": [
+        {
+          "name": "Send Message",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.collectionVariables.set('jobId', jsonData.data.job_id);",
+                  "    console.log('Job ID saved:', jsonData.data.job_id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"lead_id\": \"{{leadId}}\",\n  \"channel\": \"email\",\n  \"content\": \"Hi John, thanks for your interest in our product! Let me share some information that might be helpful.\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/lead/send",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "lead",
+                "send"
+              ]
+            },
+            "description": "Queue an outbound message to a lead. Channels: email, whatsapp, voice, linkedin, ads"
+          },
+          "response": []
+        },
+        {
+          "name": "Simulate Inbound Reply",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"lead_id\": \"{{leadId}}\",\n  \"channel\": \"email\",\n  \"content\": \"Yes, I'm very interested! Can you tell me more about pricing and features?\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/lead/reply",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "lead",
+                "reply"
+              ]
+            },
+            "description": "Simulate an inbound reply from a prospect. This would normally come from a webhook. Updates lead status to 'replied'."
+          },
+          "response": []
+        },
+        {
+          "name": "Generate AI Reply",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.collectionVariables.set('jobId', jsonData.data.job_id);",
+                  "    console.log('AI Reply Job ID saved:', jsonData.data.job_id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"lead_id\": \"{{leadId}}\",\n  \"channel\": \"email\",\n  \"context\": \"They asked about pricing and features. Emphasize our competitive pricing and unique AI capabilities.\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/lead/ai/reply",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "lead",
+                "ai",
+                "reply"
+              ]
+            },
+            "description": "Generate an AI-powered response and queue it for sending. Updates lead status to 'engaged'."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Admin & Monitoring",
+      "item": [
+        {
+          "name": "View All Jobs",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/jobs?limit=50",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "jobs"
+              ],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "50",
+                  "description": "Number of jobs to return (default: 50)"
+                },
+                {
+                  "key": "status",
+                  "value": "active",
+                  "description": "Filter by job state (active, completed, failed, etc.)",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "View pg-boss job queue with optional filtering by status. Returns jobs and statistics."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Job Statistics",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/jobs/stats",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "jobs",
+                "stats"
+              ]
+            },
+            "description": "Get job queue statistics including counts by state, counts by name, and recent failures."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Specific Job",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/jobs/{{jobId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "jobs",
+                "{{jobId}}"
+              ]
+            },
+            "description": "Get complete details for a specific job including data and output."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Complete Flow Example",
+      "item": [
+        {
+          "name": "1. Create Lead",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.collectionVariables.set('leadId', jsonData.data.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Jane Smith\",\n  \"email\": \"jane.smith@example.com\",\n  \"phone\": \"+1987654321\",\n  \"metadata\": {\n    \"source\": \"linkedin\",\n    \"interest\": \"enterprise-plan\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/lead",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "lead"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "2. Send Initial Message",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"lead_id\": \"{{leadId}}\",\n  \"channel\": \"email\",\n  \"content\": \"Hi Jane! I saw your interest in our enterprise plan. I'd love to discuss how we can help your team.\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/lead/send",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "lead",
+                "send"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "3. Simulate Prospect Reply",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"lead_id\": \"{{leadId}}\",\n  \"channel\": \"email\",\n  \"content\": \"Thanks for reaching out! We're looking for a solution that can handle high volume. What can you offer?\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/lead/reply",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "lead",
+                "reply"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "4. Generate AI Response",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"lead_id\": \"{{leadId}}\",\n  \"channel\": \"email\",\n  \"context\": \"They need high volume handling. Mention our scalability, enterprise features, and offer a demo.\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/lead/ai/reply",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "lead",
+                "ai",
+                "reply"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "5. Check Complete Timeline",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/lead/{{leadId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "lead",
+                "{{leadId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "6. Monitor Jobs",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/jobs/stats",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "jobs",
+                "stats"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "description": "Complete flow demonstrating the full lead lifecycle: create → contact → reply → AI engage → monitor"
+    }
+  ]
+}
