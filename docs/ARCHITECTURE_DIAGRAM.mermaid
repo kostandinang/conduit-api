@@ -1,0 +1,105 @@
+graph TB
+    subgraph "Client Layer"
+        Frontend[Frontend Web App]
+    end
+
+    subgraph "API Layer"
+        API[Express API Server<br/>Port 3000]
+        Routes[Routes<br/>POST /lead, /send, /reply, /ai/reply<br/>GET /lead/:id]
+    end
+
+    subgraph "Service Layer"
+        LeadSvc[Lead Service<br/>Lead lifecycle & state]
+        MsgSvc[Message Service<br/>Channel abstraction]
+        AISvc[AI Service<br/>Response generation]
+        EventSvc[Event Service<br/>Audit logging]
+    end
+
+    subgraph "Queue System"
+        Queue[(pg-boss Queue<br/>PostgreSQL-based)]
+        SendJob[send-message jobs]
+        AIJob[generate-ai-reply jobs]
+    end
+
+    subgraph "Worker Layer"
+        Worker1[Send Message Worker<br/>Processes outbound messages]
+        Worker2[AI Reply Worker<br/>Generates AI responses]
+    end
+
+    subgraph "Database - Supabase PostgreSQL"
+        LeadsDB[(leads table<br/>Lead records)]
+        MessagesDB[(messages table<br/>All communications)]
+        JobsDB[(jobs table<br/>Job tracking)]
+        EventsDB[(events table<br/>Audit log)]
+    end
+
+    subgraph "External Services"
+        OpenAI[OpenAI API<br/>GPT models]
+        Email[Email Providers<br/>SendGrid, AWS SES]
+        WhatsApp[WhatsApp API<br/>Twilio, Meta]
+        LinkedIn[LinkedIn API]
+        Voice[Voice API<br/>Twilio]
+    end
+
+    %% Frontend to API
+    Frontend -->|HTTP Requests| API
+    API -->|HTTP Responses| Frontend
+
+    %% API to Routes to Services
+    API --> Routes
+    Routes --> LeadSvc
+    Routes --> MsgSvc
+    Routes --> AISvc
+
+    %% Services to Database
+    LeadSvc -->|CRUD operations| LeadsDB
+    MsgSvc -->|CRUD operations| MessagesDB
+    LeadSvc --> EventSvc
+    MsgSvc --> EventSvc
+    AISvc --> EventSvc
+    EventSvc -->|Log events| EventsDB
+
+    %% Services to Queue
+    MsgSvc -->|Enqueue jobs| Queue
+    AISvc -->|Enqueue jobs| Queue
+
+    %% Queue to Jobs
+    Queue --> SendJob
+    Queue --> AIJob
+
+    %% Workers process jobs
+    SendJob -->|Processed by| Worker1
+    AIJob -->|Processed by| Worker2
+
+    %% Workers to Database
+    Worker1 -->|Update status| MessagesDB
+    Worker1 -->|Track jobs| JobsDB
+    Worker2 -->|Create messages| MessagesDB
+    Worker2 -->|Track jobs| JobsDB
+
+    %% Workers to External APIs
+    Worker1 -->|Send messages| Email
+    Worker1 -->|Send messages| WhatsApp
+    Worker1 -->|Send messages| LinkedIn
+    Worker1 -->|Send messages| Voice
+    Worker2 -->|Generate text| OpenAI
+
+    %% Worker back to Queue (for AI worker queuing messages)
+    Worker2 -.->|Queue message| Queue
+
+    %% Styling
+    classDef frontend fill:#e3f2fd,stroke:#1976d2,stroke-width:2px
+    classDef api fill:#e8f5e9,stroke:#388e3c,stroke-width:2px
+    classDef service fill:#fff3e0,stroke:#f57c00,stroke-width:2px
+    classDef queue fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px
+    classDef worker fill:#fce4ec,stroke:#c2185b,stroke-width:2px
+    classDef database fill:#e0f7fa,stroke:#0097a7,stroke-width:2px
+    classDef external fill:#fafafa,stroke:#616161,stroke-width:2px
+
+    class Frontend frontend
+    class API,Routes api
+    class LeadSvc,MsgSvc,AISvc,EventSvc service
+    class Queue,SendJob,AIJob queue
+    class Worker1,Worker2 worker
+    class LeadsDB,MessagesDB,JobsDB,EventsDB database
+    class OpenAI,Email,WhatsApp,LinkedIn,Voice external
