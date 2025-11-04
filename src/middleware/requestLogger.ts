@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from 'express';
+import type { NextFunction, Request, Response } from 'express';
 import { logger } from '../utils/logger';
 
 /**
@@ -7,12 +7,15 @@ import { logger } from '../utils/logger';
  * Logs all incoming HTTP requests with relevant metadata
  */
 export function requestLogger(req: Request, res: Response, next: NextFunction): void {
-  logger.info({
-    method: req.method,
-    path: req.path,
-    ip: req.ip,
-    userAgent: req.get('user-agent'),
-  }, 'Incoming request');
+	logger.info(
+		{
+			method: req.method,
+			path: req.path,
+			ip: req.ip,
+			userAgent: req.get('user-agent'),
+		},
+		'Incoming request'
+	);
 
-  next();
+	next();
 }

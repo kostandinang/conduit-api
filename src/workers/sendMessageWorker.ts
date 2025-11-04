@@ -1,9 +1,9 @@
 import { getQueue, QUEUES } from '../queues/queue';
-import { logger } from '../utils/logger';
-import { messageService } from '../services/MessageService';
 import { leadService } from '../services/LeadService';
+import { messageService } from '../services/MessageService';
+import type { SendMessageJobData } from '../types';
+import { logger } from '../utils/logger';
 import { supabase } from '../utils/supabase';
-import { SendMessageJobData } from '../types';
 
 /**
  * Send Message Worker
@@ -18,81 +18,75 @@ import { SendMessageJobData } from '../types';
  * 4. Log job completion in jobs table
  */
 export async function registerSendMessageWorker() {
-  const queue = getQueue();
+	const queue = getQueue();
 
-  await queue.work<SendMessageJobData>(
-    QUEUES.SEND_MESSAGE,
-    {
-      teamSize: 5, // Process up to 5 jobs concurrently
-      teamConcurrency: 1, // Each worker processes 1 job at a time
-    },
-    async (job) => {
-      const { message_id, lead_id, channel } = job.data;
+	await queue.work<SendMessageJobData>(
+		QUEUES.SEND_MESSAGE,
+		{
+			teamSize: 5, // Process up to 5 jobs concurrently
+			teamConcurrency: 1, // Each worker processes 1 job at a time
+		},
+		async (job) => {
+			const { message_id, lead_id, channel } = job.data;
 
-      logger.info(
-        { jobId: job.id, messageId: message_id, leadId: lead_id },
-        'Processing send-message job'
-      );
+			logger.info(
+				{ jobId: job.id, messageId: message_id, leadId: lead_id },
+				'Processing send-message job'
+			);
 
-      // Track job in database
-      const { data: jobRecord } = await supabase
-        .from('jobs')
-        .insert({
-          lead_id,
-          job_name: QUEUES.SEND_MESSAGE,
-          status: 'active',
-          attempts: 1,
-          max_attempts: 3,
-        })
-        .select()
-        .single();
+			// Track job in database
+			const { data: jobRecord } = await supabase
+				.from('jobs')
+				.insert({
+					lead_id,
+					job_name: QUEUES.SEND_MESSAGE,
+					status: 'active',
+					attempts: 1,
+					max_attempts: 3,
+				})
+				.select()
+				.single();
 
-      try {
-        // Send the message
-        await messageService.sendMessage(message_id);
+			try {
+				// Send the message
+				await messageService.sendMessage(message_id);
 
-        // Update lead status: new -> contacted (if first outbound message)
-        const lead = await leadService.getLead(lead_id);
-        if (lead && lead.status === 'new') {
-          await leadService.updateLeadStatus(lead_id, 'contacted', 'First message sent');
-        }
+				// Update lead status: new -> contacted (if first outbound message)
+				const lead = await leadService.getLead(lead_id);
+				if (lead && lead.status === 'new') {
+					await leadService.updateLeadStatus(lead_id, 'contacted', 'First message sent');
+				}
 
-        // Mark job as completed
-        if (jobRecord) {
-          await supabase
-            .from('jobs')
-            .update({
-              status: 'completed',
-              completed_at: new Date().toISOString(),
-            })
-            .eq('id', jobRecord.id);
-        }
+				// Mark job as completed
+				if (jobRecord) {
+					await supabase
+						.from('jobs')
+						.update({
+							status: 'completed',
+							completed_at: new Date().toISOString(),
+						})
+						.eq('id', jobRecord.id);
+				}
 
-        logger.info(
-          { jobId: job.id, messageId: message_id },
-          'send-message job completed'
-        );
-      } catch (error) {
-        logger.error(
-          { error, jobId: job.id, messageId: message_id },
-          'send-message job failed'
-        );
+				logger.info({ jobId: job.id, messageId: message_id }, 'send-message job completed');
+			} catch (error) {
+				logger.error({ error, jobId: job.id, messageId: message_id }, 'send-message job failed');
 
-        // Update job status
-        if (jobRecord) {
-          await supabase
-            .from('jobs')
-            .update({
-              status: 'failed',
-              error: error instanceof Error ? error.message : 'Unknown error',
-            })
-            .eq('id', jobRecord.id);
-        }
+				// Update job status
+				if (jobRecord) {
+					await supabase
+						.from('jobs')
+						.update({
+							status: 'failed',
+							error: error instanceof Error ? error.message : 'Unknown error',
+						})
+						.eq('id', jobRecord.id);
+				}
 
-        throw error; // pg-boss will handle retry
-      }
-    }
-  );
+				throw error; // pg-boss will handle retry
+			}
+		}
+	);
 
-  logger.info('Send message worker registered');
+	logger.info('Send message worker registered');
 }

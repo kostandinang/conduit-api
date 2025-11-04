@@ -12,11 +12,11 @@ const router = Router();
  * Basic health check endpoint
  */
 router.get('/', (req, res) => {
-  res.json({
-    status: 'healthy',
-    service: 'conduit',
-    timestamp: new Date().toISOString(),
-  });
+	res.json({
+		status: 'healthy',
+		service: 'conduit',
+		timestamp: new Date().toISOString(),
+	});
 });
 
 /**
@@ -24,18 +24,18 @@ router.get('/', (req, res) => {
  * Detailed health check with system info
  */
 router.get('/detailed', (req, res) => {
-  res.json({
-    status: 'healthy',
-    service: 'conduit',
-    timestamp: new Date().toISOString(),
-    uptime: process.uptime(),
-    memory: {
-      used: Math.round(process.memoryUsage().heapUsed / 1024 / 1024),
-      total: Math.round(process.memoryUsage().heapTotal / 1024 / 1024),
-      unit: 'MB',
-    },
-    environment: process.env.NODE_ENV || 'development',
-  });
+	res.json({
+		status: 'healthy',
+		service: 'conduit',
+		timestamp: new Date().toISOString(),
+		uptime: process.uptime(),
+		memory: {
+			used: Math.round(process.memoryUsage().heapUsed / 1024 / 1024),
+			total: Math.round(process.memoryUsage().heapTotal / 1024 / 1024),
+			unit: 'MB',
+		},
+		environment: process.env.NODE_ENV || 'development',
+	});
 });
 
 export default router;

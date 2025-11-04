@@ -4,5 +4,5 @@
  * Exports all middleware functions for easy importing
  */
 
+export { errorHandler, notFoundHandler } from './errorHandler';
 export { requestLogger } from './requestLogger';
-export { notFoundHandler, errorHandler } from './errorHandler';

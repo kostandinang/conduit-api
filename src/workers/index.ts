@@ -1,7 +1,7 @@
 import { initQueue, stopQueue } from '../queues/queue';
-import { registerSendMessageWorker } from './sendMessageWorker';
-import { registerAIReplyWorker } from './aiReplyWorker';
 import { logger } from '../utils/logger';
+import { registerAIReplyWorker } from './aiReplyWorker';
+import { registerSendMessageWorker } from './sendMessageWorker';
 
 /**
  * Worker Process Entry Point
@@ -13,35 +13,35 @@ import { logger } from '../utils/logger';
  */
 
 async function main() {
-  logger.info('Starting Conduit workers');
+	logger.info('Starting Conduit workers');
 
-  try {
-    // Initialize queue connection
-    await initQueue();
+	try {
+		// Initialize queue connection
+		await initQueue();
 
-    // Register all workers
-    await registerSendMessageWorker();
-    await registerAIReplyWorker();
+		// Register all workers
+		await registerSendMessageWorker();
+		await registerAIReplyWorker();
 
-    logger.info('All workers registered and running');
-    logger.info('Press Ctrl+C to stop');
-  } catch (error) {
-    logger.error({ error }, 'Failed to start workers');
-    process.exit(1);
-  }
+		logger.info('All workers registered and running');
+		logger.info('Press Ctrl+C to stop');
+	} catch (error) {
+		logger.error({ error }, 'Failed to start workers');
+		process.exit(1);
+	}
 }
 
 // Graceful shutdown
 process.on('SIGINT', async () => {
-  logger.info('Shutting down workers...');
-  await stopQueue();
-  process.exit(0);
+	logger.info('Shutting down workers...');
+	await stopQueue();
+	process.exit(0);
 });
 
 process.on('SIGTERM', async () => {
-  logger.info('Shutting down workers...');
-  await stopQueue();
-  process.exit(0);
+	logger.info('Shutting down workers...');
+	await stopQueue();
+	process.exit(0);
 });
 
 main();
