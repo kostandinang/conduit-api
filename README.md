@@ -1,4 +1,4 @@
-# 🚀 Conduit API
+# 🚀 Conduit
 
 > **Turn conversations into customers** with AI-powered multi-channel automation
 
@@ -165,6 +165,7 @@ GET /lead/:id
 - 💬 Have questions? Let's chat!
 
 ---
+
 # Conduit API
 
 [![Node.js](https://img.shields.io/badge/Node.js-18%2B-339933?style=flat&logo=node.js&logoColor=white)](https://nodejs.org/)
