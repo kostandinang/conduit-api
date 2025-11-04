@@ -14,7 +14,7 @@ import { SendMessageJobData } from '../types';
  * Job flow:
  * 1. Receive message_id from queue
  * 2. Send message via appropriate channel
- * 3. Update lead status if first message (new → contacted)
+ * 3. Update lead status if first message (new -> contacted)
  * 4. Log job completion in jobs table
  */
 export async function registerSendMessageWorker() {
@@ -51,7 +51,7 @@ export async function registerSendMessageWorker() {
         // Send the message
         await messageService.sendMessage(message_id);
 
-        // Update lead status: new → contacted (if first outbound message)
+        // Update lead status: new -> contacted (if first outbound message)
         const lead = await leadService.getLead(lead_id);
         if (lead && lead.status === 'new') {
           await leadService.updateLeadStatus(lead_id, 'contacted', 'First message sent');

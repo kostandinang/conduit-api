@@ -17,7 +17,7 @@ import { GenerateAIReplyJobData } from '../types';
  * 2. Generate AI reply based on conversation context
  * 3. Create outbound message
  * 4. Queue message for sending (separate job)
- * 5. Update lead status (replied → engaged)
+ * 5. Update lead status (to. engaged)
  */
 export async function registerAIReplyWorker() {
   const queue = getQueue();
@@ -69,7 +69,7 @@ export async function registerAIReplyWorker() {
           content: reply,
         });
 
-        // Update lead status: replied → engaged
+        // Update lead status: replied -> engaged
         const lead = await leadService.getLead(lead_id);
         if (lead && lead.status === 'replied') {
           await leadService.updateLeadStatus(
